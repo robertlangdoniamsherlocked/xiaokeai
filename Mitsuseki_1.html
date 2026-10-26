@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuộn mới - Mật Cổ Thư</title>
+    <!-- Phông chữ cổ phong Hán Việt -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #120907;
+            --main-red: #8B1A1A;
+            --gold-light: #F3E5AB;
+            --gold-bright: #FFD700;
+            --text-color: #E8D8C8;
+            --border-gold: #C5A059;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Noto Serif TC', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle, #2a100b 0%, #0a0403 100%);
+        }
+
+        /* Khung chính màn hình game */
+        .game-card {
+            background: rgba(26, 12, 9, 0.95);
+            border: 3px solid var(--border-gold);
+            outline: 2px solid var(--main-red);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 650px;
+            padding: 35px 30px;
+            box-shadow: 0 0 30px rgba(197, 160, 89, 0.2), inset 0 0 15px rgba(0,0,0,0.8);
+            position: relative;
+            text-align: center;
+        }
+
+        .game-card::before {
+            content: "🪶";
+            position: absolute;
+            top: 10px; left: 10px;
+            color: var(--border-gold);
+            font-size: 18px;
+        }
+        .game-card::after {
+            content: "🪶";
+            position: absolute;
+            bottom: 10px; right: 10px;
+            color: var(--border-gold);
+            font-size: 18px;
+        }
+
+        h1.title {
+            color: var(--gold-bright);
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(255,215,0,0.3);
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: #a89078;
+            margin-bottom: 25px;
+            font-style: italic;
+        }
+
+        /* Màn hình Khai thư */
+        .welcome-screen {
+            padding: 20px 10px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        .welcome-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        .welcome-desc {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--gold-light);
+            margin-bottom: 30px;
+        }
+
+        /* Tiến trình */
+        .progress-bar {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .step-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid var(--border-gold);
+            background: #25120c;
+            color: #888;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            transition: all 0.4s ease;
+        }
+
+        .step-dot.active {
+            background: var(--main-red);
+            color: var(--gold-bright);
+            border-color: var(--gold-bright);
+            box-shadow: 0 0 10px var(--main-red);
+        }
+
+        .step-dot.completed {
+            background: var(--border-gold);
+            color: #1a0c09;
+            font-weight: bold;
+        }
+
+        /* Khung câu hỏi & Nhập liệu */
+        .question-box {
+            background: rgba(15, 6, 4, 0.6);
+            border: 1px dashed var(--border-gold);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            min-height: 110px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--gold-light);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 12px 18px;
+            background: #1e0e0a;
+            border: 1px solid var(--border-gold);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 1rem;
+            font-family: inherit;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--gold-bright);
+            box-shadow: 0 0 8px rgba(255,215,0,0.3);
+        }
+
+        /* Nút bấm */
+        .btn-submit {
+            background: linear-gradient(135deg, #8B1A1A 0%, #520e0e 100%);
+            color: var(--gold-light);
+            border: 1px solid var(--border-gold);
+            padding: 12px 35px;
+            font-size: 1.1rem;
+            font-family: inherit;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            letter-spacing: 2px;
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(135deg, #a62121 0%, #6e1515 100%);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .hint-text {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: #e74c3c;
+            min-height: 20px;
+        }
+
+        /* Màn hình hoàn thành / Thư thưởng */
+        .scroll-reward {
+            display: none;
+            animation: fadeIn 1s forwards;
+            padding: 30px 20px;
+            border-radius: 6px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            text-align: left;
+            position: relative;
+            transition: all 0.5s ease;
+        }
+
+        .scroll-reward h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .scroll-content {
+            font-size: 1rem;
+            line-height: 1.8;
+            white-space: pre-line;
+        }
+
+        /* ---------------------------------------------------
+           THEME CHO CÁC ENDINGS
+        --------------------------------------------------- */
+        /* Ending 1: Liễu Thanh Ca (Trắng - Đen - Lục nhạt) */
+        .theme-liuchangge {
+            background: #f4f7f4;
+            color: #1a241e;
+            border-left: 8px solid #2e5a44;
+            border-right: 8px solid #2e5a44;
+        }
+        .theme-liuchangge h2 {
+            color: #1b3b2b;
+        }
+
+        /* Ending 2: Giang Trừng / Giang Vãn Ngâm (Tím Vân Mộng) */
+        .theme-jiangcheng {
+            background: #2a1b3d;
+            color: #e6d7ff;
+            border-left: 8px solid #7b4397;
+            border-right: 8px solid #7b4397;
+        }
+        .theme-jiangcheng h2 {
+            color: #d4a5ff;
+        }
+
+        /* Ending 3: Nguyễn Thanh Thảo Linh / A Tú / tiểu khả ái (Hồng nhạt) */
+        .theme-cutie {
+            background: #fff0f3;
+            color: #4a2c35;
+            border-left: 8px solid #ff85a1;
+            border-right: 8px solid #ff85a1;
+        }
+        .theme-cutie h2 {
+            color: #c9184a;
+        }
+
+        /* Ending 4: Thẩm Thanh Thu / Thẩm Cửu (Trắng - Lục nhạt / Xanh trúc) */
+        .theme-thanhquang {
+            background: #eef5f1;
+            color: #1f3328;
+            border-left: 8px solid #3c7a57;
+            border-right: 8px solid #3c7a57;
+        }
+        .theme-thanhquang h2 {
+            color: #275239;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(255,215,0,0.2)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 10px rgba(255,215,0,0.6)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(255,215,0,0.2)); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-card">
+    <h1 class="title">📜 MẬT TỊCH</h1>
+    <div class="subtitle">🔹🔹🔹密籍🔹🔹🔹</div>
+
+    <!-- 1. Màn hình Chào mừng -->
+    <div id="welcomeScreen" class="welcome-screen">
+        <div class="welcome-icon">🔥</div>
+        <p class="welcome-desc">
+            Trần phong kỉ cửu, Mật Tịch phong ấn không thể phá vỡ hoàn toàn.<br>
+            Ta đã qua tay nhiều người nhưng chưa từng được khai mở. Liệu nhà ngươi có xứng đáng...?<br><br>
+            <i>Mong cầu thử sức, thỉnh chạm tay khai mở phong ấn.</i>
+        </p>
+        <button class="btn-submit" onclick="startQuiz()">KHAI ẤN</button>
+    </div>
+
+    <!-- 2. Tiến trình -->
+    <div class="progress-bar" id="progressBar" style="display: none;">
+        <div class="step-dot active" id="dot-0">1</div>
+        <div class="step-dot" id="dot-1">2</div>
+        <div class="step-dot" id="dot-2">3</div>
+    </div>
+
+    <!-- 3. Màn hình chơi game -->
+    <div id="quizContainer" style="display: none;">
+        <div class="question-box">
+            <div class="question-text" id="questionText"> Thỉnh tịnh tâm... </div>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="answerInput" placeholder="Vận linh lực nơi đây..." autocomplete="off">
+        </div>
+
+        <button class="btn-submit" onclick="checkAnswer()">PHÓNG LINH LỰC</button>
+        <div class="hint-text" id="hintText"></div>
+    </div>
+
+    <!-- 4. Thư thưởng hiển thị sau khi hoàn thành -->
+    <div class="scroll-reward" id="rewardScroll">
+        <h2>📜TOÀN VĂN📜</h2>
+        <div class="scroll-content" id="finalMessage">
+            <!-- Lời chúc sẽ tự thay đổi dựa theo Ending -->
+        </div>
+    </div>
+</div>
+
+<script>
+    /* ===================================================
+       CẤU HÌNH CÂU HỎI VÀ ĐÁP ÁN
+    =================================================== */
+    const quizData = [
+        {
+            question: "Câu 1: Thỉnh hỏi quý danh các hạ?",
+            acceptedAnswers: ["Liễu Thanh Ca", "Giang Trừng", "Giang Vãn Ngâm", "tiểu khả ái", "Nguyễn Thanh Thảo Linh", "A Tú", "Thẩm Thanh Thu", "Thẩm Cửu"], 
+            hint: "Là ngươi, cách ngươi muốn được gọi, hay nhân vật của ngươi?"
+        },
+        {
+            question: "Câu 2: Vị hảo soái và bá khí nhất Tu Chân Giới mà không cần tài liệu chứng minh?",
+            acceptedAnswers: ["Mặc Huyền Sương", "Mặc Nhiên", "Sở Vãn Ninh"], 
+            hint: "Ngươi thực sự không biết sao?"
+        },
+        {
+            question: "Câu 3: Thiên lý năng tương ngộ, nhân dịp gì mà các hạ lại nhặt được ta?",
+            acceptedAnswers: ["sinh nhật", "sinh thần", "sinh nhật bạn", "ngày sinh thần", "sinh nhật ta", "sinh thần ta", "ngày sinh nhật", "ngày sinh thần", "ngày sinh nhật ta", "ngày sinh thần ta", "my birthday"],
+            hint: "// Búng trán y // còn có thể sai sao?"
+        }
+    ];
+
+    /* ===================================================
+       NỘI DUNG 4 ENDINGS
+    =================================================== */
+    const endings = {
+        liuchangge: {
+            themeClass: "theme-liuchangge",
+            message: `[⚔️BÁCH CHIẾN PHONG - LIỄU THANH CA⚔️]
+
+Liễu Thanh Ca, khá khen cho nhà ngươi đã trả lời rất chính xác câu hỏi thứ hai, thật sự là thông minh đột xuất, ta không khỏi lấy làm ngạc nhiên 😏 Ta cứ ngỡ ngươi như bao tên cạp đất thay cơm khác, lọ mọ mãi không mở nổi cái mật tịch cỏn con này chứ. Không hổ danh Bách Chiến Phong phong chủ, quả thực mong tháo sẽ tháo, muốn dỡ là dỡ, bái phục bái phục. Ta là cất công tạo hẳn cái cuộn sách trông có vẻ tuyệt mật đến nguy hiểm này, chỉ để một người duy nhất có thể mở thôi, thật đúng như câu hỏi thứ hai phải không? Thôi, không dông dài nữa. Sinh thần khoái lạc. Nhưng dù thêm một năm kinh nghiệm đi chăng nữa, nhà ngươi vẫn là tiểu khả ái của ta thôi. Ta sẽ còn cắn ngươi dài dài. Nhà ngươi ngọt mà không bỏng, tự ngươi cũng đã chính là mỹ vị nhân gian của riêng mình ta, gọi tắt là mỹ nhân. 
+
+
+   Sư tôn, đồ đệ chẳng học rộng hiểu nhiều, không dám chúc bừa, hì hì…  mong người có giận cũng không trách phạt quá nặng. Hmm…, mà thực ra sư tôn có làm gì thì ta cũng thấy không sao, vì đó là sư tôn mà. Lần đầu gặp người, ta đã bị hạ gục trong vòng 5 giây, từ đó rất mến mộ người, thật may có Tuyệt Thế tiền bối gợi ý cho mới có thể được làm đệ tử dưới tọa người. Sư tôn, Thanh Ca, khả ái, người sinh thần khoái lạc. Ta kính chúc người tuổi mới hoạt bát lanh lợi, à không… hình như là… là sinh long hoạt hổ… Đại loại vậy. Chúc người đánh đâu thắng đó, đánh thắng tạp chủng ma tộc, muốn gì có nấy, cầu được ước thấy và mong bao nhiêu vui vẻ có bấy nhiêu hạnh phúc. Ừm, Mạc Huyền gì đấy dạy ta đến vậy thôi. Sư tôn thấy ta học có nhanh không?
+
+
+P/s: Ta không ưa tên hắc bào kia./ Ta không thích vị tiền bối đồ đen kia.`
+        },
+        jiangcheng: {
+            themeClass: "theme-jiangcheng",
+            message: `[🔮VÂN MỘNG GIANG THỊ - GIANG VÃN NGÂM🔮]
+
+Giang Tông chủ, thỉnh lượng thứ vì sự đường đột, nhưng có thể chiếu cố nghe ta nhiều lời chút không? 
+
+   À, thực ra cũng không phải chuyện gì to tát đâu, chỉ là hôm nay có phần đặc biệt hơn mọi ngày trong năm. Từng nghe đâu “duyên sâu gặp quân, duyên mỏng lỡ quân”, kiếp này được tương ngộ chẳng lầm lạc nhau, âu cũng là điều đáng vui mừng, thậm chí còn là niềm hân hoan lớn cho ta. Trải qua từng ấy sóng gió thăng trầm rồi hai phía lại cập bến bình yên, ái ố hỉ nộ đều bên nhau, thật tốt. Vì hai người chỉ còn có nhau, lại cũng vì chỉ hai người mới nhìn thấu tâm can nhau, đối đãi nhau trước sau như một bất kể vinh nhục đục trong. Nhân gian thực đẹp, là nhờ có ngươi.
+
+   Sinh thần vui vẻ, một đời an nhiên. Vãn Ngâm, ta nguyện làm nơi trở về cho ngươi, cũng sẽ vì ngươi mà bảo hộ quãng đường ngươi đi khỏi gió tuyết cả đời.`
+        },
+        cutie: {
+            themeClass: "theme-cutie",
+            message: `
+  Không nghĩ ngươi sẽ mò được đến ending này sớm vậy, chúc mừng chúc mừng. 
+
+  A Tú, Thảo Linh, tiểu khả ái, sinh nhật vui vẻ nhé. Tuy quen nhau chưa lâu, ta vẫn coi ngươi như một người rất quan trọng, chắc chắn là bậc nhì toàn giới roleplay cho đến khi ta hoàn thiện được tài liệu chứng minh 🥸. Thú thực, ngươi là quá nhiều lần đầu của ta. 
+   Có một điều rất đáng để học hỏi từ ngươi là cách ngươi đối diện với những chuyện không hay trong cuộc sống, hoặc ít nhất là những gì ta nhìn thấy được. Một ngày như thể cả thế giới chống lại mình, ngươi vẫn chỉ kể những người xung quanh với giọng điệu nhẹ nhàng tưởng chừng bình thản, hoàn toàn không chút gì nặng lời (mà nặng lời thì lại là ba ngươi - người được nghe kể :v). Ta không chắc có phải do ta chưa thấy hết những gì ngươi bộc lộ không, hay người kìm nén, hay ngươi là người rất tích cực. Dù là cái nào, ta cũng rất vui vì ngươi đã chọn giải tỏa chứ không giấu hết trong lòng tất cả, như vậy ngươi sẽ vui vẻ trở lại sớm hơn. 
+   Chúc ngươi luôn được khỏe mạnh, học tập tốt, làm điều mình mong muốn, luôn tươi cười, làm gì cũng khả ái, má bánh bao đưa hết cho ta 🌚. Chuyện thức khuya nhìn chung học sinh sinh viên cũng khó nói, chỉ biết chúc ngươi có nhiều sức và tỉnh táo dù ngủ bao nhiêu tiếng.
+   Tuổi mới tốt lành, cảm ơn vì đã luôn già hơn ta :)
+
+TTG `
+        },
+        shenqingqiu: {
+            themeClass: "theme-thanhquang",
+            message: `[🎋THANH TĨNH PHONG - THẨM THANH THU🎋]
+
+   Thẩm Thanh Thu, người như ngươi vậy mà cũng mở được phong ấn, ta thực được mở mang tầm mắt rồi. Bình thường cũng đâu có hứng thú với cổ tịch, sư tôn là đang mong chờ điều gì ở thứ này? Chẳng phải đã luôn dành tặng ngươi lời vàng ý ngọc khi ngày đêm triền miên trên giường rồi sao? Cảm thấy không đủ thì chỉ việc nói ra, đồ đệ hứa sẽ toàn tâm toàn ý phục vụ sư tôn hết mình. Hửm, thôi được. Nể tình biểu hiện trên giường gần đây không tệ, vẫn là có thể tặng sư tôn chút đường ngọt. 
+   Thẩm Thanh Thu, sinh thần khoái lạc, ngươi biết rõ muốn có sinh nhật y như lời chúc thì phải tìm đến ai và ở đâu rồi đấy. Đồ đệ sẽ không bao giờ làm sư tôn thất vọng nữa đâu.
+`
+        }
+    };
+
+    /* ===================================================
+       LOGIC XỬ LÝ GAME
+    =================================================== */
+    let currentStep = 0;
+    let selectedEndingKey = 'cutie'; // Default fallback
+
+    function startQuiz() {
+        document.getElementById('welcomeScreen').style.display = 'none';
+        document.getElementById('progressBar').style.display = 'flex';
+        document.getElementById('quizContainer').style.display = 'block';
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const q = quizData[currentStep];
+        document.getElementById('questionText').innerText = q.question;
+        document.getElementById('answerInput').value = '';
+        document.getElementById('hintText').innerText = '';
+        
+        // Cập nhật thanh tiến trình
+        for (let i = 0; i < quizData.length; i++) {
+            const dot = document.getElementById(`dot-${i}`);
+            if (i < currentStep) {
+                dot.className = "step-dot completed";
+                dot.innerText = "✓";
+            } else if (i === currentStep) {
+                dot.className = "step-dot active";
+                dot.innerText = i + 1;
+            } else {
+                dot.className = "step-dot";
+                dot.innerText = i + 1;
+            }
+        }
+    }
+
+    function checkAnswer() {
+        const rawInput = document.getElementById('answerInput').value.trim();
+        const userAns = rawInput.toLowerCase();
+        const currentQuiz = quizData[currentStep];
+
+        if (!userAns) {
+            document.getElementById('hintText').innerText = "Hãy nhập đáp án trước khi xác nhận!";
+            return;
+        }
+
+        // Kiểm tra đáp án hợp lệ
+        const isCorrect = currentQuiz.acceptedAnswers.some(ans => userAns.includes(ans.toLowerCase()));
+
+        if (isCorrect) {
+            // Xử lý xác định Ending tại Câu 1 (Index 0)
+            if (currentStep === 0) {
+                if (userAns.includes("liễu thanh ca") || userAns.includes("lieu thanh ca")) {
+                    selectedEndingKey = "liuchangge";
+                } else if (userAns.includes("giang trừng") || userAns.includes("giang vãn ngâm") || userAns.includes("giang trung") || userAns.includes("giang van ngam")) {
+                    selectedEndingKey = "jiangcheng";
+                } else if (userAns.includes("thẩm thanh thu") || userAns.includes("tham thanh thu") || userAns.includes("thẩm cửu") || userAns.includes("tham cuu")) {
+                    selectedEndingKey = "shenqingqiu";
+                } else {
+                    selectedEndingKey = "cutie";
+                }
+            }
+
+            currentStep++;
+            if (currentStep < quizData.length) {
+                loadQuestion();
+            } else {
+                showReward();
+            }
+        } else {
+            document.getElementById('hintText').innerText = "❌ " + currentQuiz.hint;
+        }
+    }
+
+    function showReward() {
+        document.getElementById('quizContainer').style.display = 'none';
+        document.getElementById('progressBar').style.display = 'none';
+        
+        const reward = document.getElementById('rewardScroll');
+        const finalEnding = endings[selectedEndingKey];
+
+        // Áp dụng class theme và nội dung tương ứng
+        reward.className = `scroll-reward ${finalEnding.themeClass}`;
+        document.getElementById('finalMessage').innerText = finalEnding.message;
+        
+        reward.style.display = 'block';
+    }
+
+    // Lắng nghe sự kiện phím Enter
+    document.getElementById("answerInput").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            checkAnswer();
+        }
+    });
+</script>
+
+</body>
+</html>
